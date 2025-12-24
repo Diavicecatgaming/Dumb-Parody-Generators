@@ -1,0 +1,23 @@
+body{
+    background-color: #000000;
+}
+#header1{
+    color: lime;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+#Generator{
+    background-color: lime;
+    border-style: hidden;
+    padding: 10px;
+    border-radius: 10px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: bold;
+}
+#GeneratorText{
+    background-color: green;
+    border-style: hidden;
+    padding: 10px;
+    border-radius: 10px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: bold;
+}
