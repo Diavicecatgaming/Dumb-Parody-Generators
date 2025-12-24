@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemeOverview</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap');
+
+        :root {
+            --bg-color: #202124;
+            --text-main: #e8eaed;
+            --text-sub: #bdc1c6;
+            --highlight-blue: rgba(138, 180, 248, 0.24);
+            --search-input: #303134;
+            --star-gradient: linear-gradient(135deg, #4285f4, #9b72cb, #d96570);
+        }
+
+        body {
+            font-family: 'Roboto', arial, sans-serif;
+            background-color: #121212;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Controls Panel */
+        .controls {
+            background: #2d2d2d;
+            padding: 20px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 700px;
+            margin-bottom: 30px;
+            display: grid;
+            gap: 10px;
+        }
+
+        textarea, input {
+            background: #1c1c1c;
+            border: 1px solid #444;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .hint { font-size: 12px; color: #aaa; margin-top: -5px; }
+
+        /* The Mockup Area */
+        #google-view {
+            background-color: var(--bg-color);
+            width: 700px;
+            padding: 30px 40px;
+            box-sizing: border-box;
+        }
+
+        .search-container {
+            margin-bottom: 24px;
+        }
+
+        .search-mock {
+            background: var(--search-input);
+            height: 44px;
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 16px;
+            color: var(--text-main);
+        }
+
+        .ai-overview-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .star-icon {
+            width: 20px;
+            height: 20px;
+            background: var(--star-gradient);
+            /* Clipping for 4-pointed star shape */
+            clip-path: polygon(50% 0%, 61% 35%, 100% 50%, 61% 65%, 50% 100%, 39% 65%, 0% 50%, 39% 35%);
+        }
+
+        .content-body {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        /* Highlight helper */
+        .hl {
+            background-color: var(--highlight-blue);
+            border-radius: 2px;
+            padding: 0 2px;
+        }
+
+        .list-section {
+            margin-top: 10px;
+            padding-top: 15px;
+        }
+
+        .list-item {
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .show-more-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 48px;
+            border: 1px solid #3c4043;
+            border-radius: 24px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .arrow-down {
+            width: 10px;
+            height: 10px;
+            border-right: 2px solid white;
+            border-bottom: 2px solid white;
+            transform: rotate(45deg);
+            margin-left: 10px;
+            margin-bottom: 4px;
+        }
+
+        button.dl-btn {
+            background: #8ab4f8;
+            color: #202124;
+            border: none;
+            padding: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <label>Search Bar:</label>
+        <input type="text" id="inQ" value="how to solve error code 69420 in unreal engine">
+        
+        <label>Main Response Text:</label>
+        <textarea id="inT" rows="3">Finally your stupid butt is doing magic heres how to summon a lemon. "Solving" an error code depends on how many apples you have.</textarea>
+        <p class="hint">Tip: Wrap text in ** (stars) to create the blue highlight effect (e.g. **summon a lemon**).</p>
+        
+        <label>List Section:</label>
+        <textarea id="inL" rows="5">TOP 5 BIGGEST APPLES
+5: Nvidia: optical media
+4: smasnug: 69 miles
+3: dementia: cats
+2: lemon: YOUR A WIZARD HARRY
+1: Mac: dead</textarea>
+        
+        <button class="dl-btn" onclick="takeShot()">Download PNG</button>
+    </div>
+
+    <div id="google-view">
+        <div class="search-container">
+            <div class="search-mock" id="outQ"></div>
+        </div>
+
+        <div class="ai-overview-header">
+            <div class="star-icon"></div>
+            AI Overview
+        </div>
+
+        <div class="content-body" id="outT"></div>
+
+        <div class="list-section" id="outL"></div>
+
+        <div class="show-more-btn">
+            Show more <span class="arrow-down"></span>
+        </div>
+    </div>
+
+    <script>
+        const inQ = document.getElementById('inQ');
+        const inT = document.getElementById('inT');
+        const inL = document.getElementById('inL');
+
+        const outQ = document.getElementById('outQ');
+        const outT = document.getElementById('outT');
+        const outL = document.getElementById('outL');
+
+        function formatHighlights(text) {
+            // Replaces **text** with <span class="hl">text</span>
+            return text.replace(/\*\*(.*?)\*\*/g, '<span class="hl">$1</span>');
+        }
+
+        function update() {
+            outQ.innerText = inQ.value;
+            outT.innerHTML = formatHighlights(inT.value);
+            
+            const lines = inL.value.split('\n');
+            outL.innerHTML = '';
+            lines.forEach(line => {
+                if(line.trim()) {
+                    const div = document.createElement('div');
+                    div.className = 'list-item';
+                    div.innerHTML = formatHighlights(line);
+                    outL.appendChild(div);
+                }
+            });
+        }
+
+        [inQ, inT, inL].forEach(el => el.addEventListener('input', update));
+        update();
+
+        function takeShot() {
+            html2canvas(document.querySelector("#google-view")).then(canvas => {
+                const a = document.createElement('a');
+                a.href = canvas.toDataURL();
+                a.download = 'ai-overview-parody.png';
+                a.click();
+            });
+        }
+    </script>
+</body>
+</html>
