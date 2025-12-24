@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows XP Window Generator (with Download)</title>
+    
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    
+    <style>
+        /* --- General Page Styling --- */
+        body {
+            font-family: 'Tahoma', sans-serif;
+            background-color: #000000;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* --- Input and Control Area --- */
+        #controls {
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            width: 90%;
+            max-width: 600px;
+        }
+
+        #controls label, #controls input, #controls textarea {
+            display: block;
+            margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        #controls input[type="number"], #controls input[type="text"] {
+            padding: 8px;
+            border: 1px solid #999;
+            border-radius: 4px;
+        }
+
+        #controls textarea {
+            min-height: 80px;
+            padding: 8px;
+            border: 1px solid #999;
+            border-radius: 4px;
+            resize: vertical;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        #generateBtn, #downloadBtn {
+            padding: 10px 15px;
+            background-color: #0078d4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s;
+            flex-grow: 1;
+        }
+
+        #generateBtn:hover, #downloadBtn:hover {
+            background-color: #005a9e;
+        }
+
+        /* --- XP Window Styling --- */
+        #windowContainer {
+            min-height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            width: 100%;
+            /* This div is the target for html2canvas, ensuring only the window is captured */
+        }
+        
+        /* The window itself is given an ID for capture */
+        #xpWindow {
+            /* XP Beige Background */
+            background-color: #ECE9D8; 
+            border: 1px solid #00138C;
+            border-radius: 8px 8px 0 0; 
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-sizing: border-box;
+            min-width: 200px;
+            min-height: 150px;
+            transition: all 0.3s ease-out;
+            position: relative;
+        }
+
+        /* The Blue Outer Frame Effect */
+        .xp-frame-padding {
+            padding: 3px;
+            padding-bottom: 0;
+            background: linear-gradient(to bottom, #0058EE 0%, #3593FF 4%, #288EFF 18%, #127dff 44%, #036dff 100%); 
+            height: 100%;
+            border-radius: 6px 6px 0 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .title-bar {
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start; /* Title on the left */
+            padding: 0 5px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.4);
+            font-size: 11pt;
+            user-select: none;
+        }
+
+        .controls-group {
+            display: flex;
+            gap: 2px;
+            margin-left: auto;
+        }
+
+        /* Shared Button Style */
+        .ctrl-btn {
+            width: 21px;
+            height: 21px;
+            border: 1px solid #fff;
+            border-radius: 3px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
+            cursor: default;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            line-height: 1;
+            font-size: 12px;
+            color: #fff;
+        }
+
+        /* Minimize/Maximize (Generic) */
+        .min-max-btn {
+            background-color: #3593FF;
+            text-shadow: none;
+            font-size: 16px;
+        }
+
+        /* The Red Close Button */
+        .close-btn {
+            background: radial-gradient(circle at center, #ffadad 0%, #e81123 100%);
+            font-size: 14px;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+        }
+        
+        .close-btn::before {
+            content: "×";
+        }
+
+        .window-content {
+            background-color: #FFFFFF;
+            flex-grow: 1;
+            border: 1px solid #ACA899;
+            margin-bottom: 3px;
+            padding: 10px;
+            overflow: auto;
+            font-size: 10pt;
+            color: #000;
+            white-space: pre-wrap; /* Essential for preserving textarea line breaks */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="controls">
+        <h2>Windows XP Window Customizer</h2>
+        
+        <label for="windowTitle">Window Title (Optional):</label>
+        <input type="text" id="windowTitle" value="My Obscure Window">
+
+        <label for="windowWidth">Width (in pixels):</label>
+        <input type="number" id="windowWidth" value="603.2" min="200" step="0.1">
+
+        <label for="windowHeight">Height (in pixels):</label>
+        <input type="number" id="windowHeight" value="438.4" min="150" step="0.1">
+
+        <label for="windowText">Content Text:</label>
+        <textarea id="windowText">This window has been captured from the HTML DOM and converted to a crisp PNG file using the html2canvas library!</textarea>
+
+        <div class="button-group">
+            <button id="generateBtn">Generate XP Window</button>
+            <button id="downloadBtn">Download as PNG</button>
+        </div>
+    </div>
+
+    <div id="windowContainer">
+        <div id="xpWindow">
+            <div class="xp-frame-padding">
+                <div class="title-bar">
+                    <span id="displayTitle">WINDOW</span>
+                    <div class="controls-group">
+                        <div class="ctrl-btn min-max-btn">_</div>
+                        <div class="ctrl-btn min-max-btn">□</div>
+                        <div class="ctrl-btn close-btn"></div>
+                    </div>
+                </div>
+                <div class="window-content" id="displayContent">
+                    Your Text Here
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- JavaScript for Interactivity and Download ---
+
+        const xpWindow = document.getElementById('xpWindow');
+        const displayTitle = document.getElementById('displayTitle');
+        const displayContent = document.getElementById('displayContent');
+
+        function updateWindow() {
+            const width = document.getElementById('windowWidth').value;
+            const height = document.getElementById('windowHeight').value;
+            const title = document.getElementById('windowTitle').value;
+            const text = document.getElementById('windowText').value;
+
+            // 1. Apply Dimensions
+            xpWindow.style.width = `${width}px`;
+            xpWindow.style.height = `${height}px`;
+
+            // 2. Apply Text
+            displayTitle.textContent = title;
+            // Use innerText to preserve line breaks from the textarea
+            displayContent.innerText = text; 
+        }
+
+        function downloadWindow() {
+            // Options for html2canvas to ensure a clean capture
+            const options = {
+                scale: 2, // Capture at 2x resolution for better quality/crispness
+                useCORS: true,
+                backgroundColor: null, // Makes the background of the image transparent
+                // Tell html2canvas to only capture the specific window element
+            };
+
+            // Use html2canvas to capture the xpWindow element
+            html2canvas(xpWindow, options).then(canvas => {
+                // Get the image data as a PNG
+                const image = canvas.toDataURL("image/png");
+
+                // Create a temporary link element for downloading
+                const link = document.createElement('a');
+                link.download = 'xp_window_' + Date.now() + '.png';
+                link.href = image;
+                
+                // Programmatically click the link to trigger the download
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+        }
+
+        // Attach event listeners
+        document.getElementById('generateBtn').addEventListener('click', updateWindow);
+        document.getElementById('downloadBtn').addEventListener('click', downloadWindow);
+
+        // Set default values on load
+        window.onload = updateWindow;
+    </script>
+
+</body>
+</html>
